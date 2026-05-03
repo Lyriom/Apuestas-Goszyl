@@ -1,3 +1,5 @@
+import base64
+import json
 from typing import Any
 
 from authlib.integrations.starlette_client import OAuth
@@ -28,13 +30,53 @@ def configure_oauth(settings: Settings | None = None) -> None:
     _registered = True
 
 
-def extract_roles(claims: dict[str, Any]) -> list[str]:
-    realm_roles = claims.get('realm_access', {}).get('roles', [])
-    resource_access = claims.get('resource_access', {})
-    client_roles: list[str] = []
-    for client in resource_access.values():
-        client_roles.extend(client.get('roles', []))
-    return sorted(set([*realm_roles, *client_roles]))
+def decode_jwt_claims(token: str | None) -> dict[str, Any]:
+    if not token:
+        return {}
+    parts = token.split('.')
+    if len(parts) < 2:
+        return {}
+    payload = parts[1]
+    payload += '=' * (-len(payload) % 4)
+    try:
+        return json.loads(base64.urlsafe_b64decode(payload).decode('utf-8'))
+    except (json.JSONDecodeError, UnicodeDecodeError, ValueError):
+        logger.warning('keycloak_token_decode_failed')
+        return {}
+
+
+def extract_roles(*claims_sets: dict[str, Any]) -> list[str]:
+    roles: list[str] = []
+    seen: set[str] = set()
+
+    def add(role: Any) -> None:
+        if not isinstance(role, str):
+            return
+        normalized = role.strip()
+        if normalized and normalized not in seen:
+            seen.add(normalized)
+            roles.append(normalized)
+
+    def add_from_claims(claims: dict[str, Any]) -> None:
+        for role in claims.get('roles', []):
+            add(role)
+        for role in claims.get('realm_access', {}).get('roles', []):
+            add(role)
+        resource_access = claims.get('resource_access', {})
+        for client in resource_access.values():
+            for role in client.get('roles', []):
+                add(role)
+
+    for claims in claims_sets:
+        add_from_claims(claims)
+    return sorted(roles)
+
+
+def merged_claims(*claims_sets: dict[str, Any]) -> dict[str, Any]:
+    merged: dict[str, Any] = {}
+    for claims in claims_sets:
+        merged.update({key: value for key, value in claims.items() if value is not None})
+    return merged
 
 
 async def login_redirect(request: Request):
@@ -46,8 +88,11 @@ async def login_redirect(request: Request):
 async def handle_callback(request: Request, db: AsyncSession) -> User:
     configure_oauth()
     token = await oauth.keycloak.authorize_access_token(request)
-    claims = token.get('userinfo') or await oauth.keycloak.userinfo(token=token)
-    roles = extract_roles(dict(claims))
+    userinfo = dict(token.get('userinfo') or await oauth.keycloak.userinfo(token=token))
+    access_claims = decode_jwt_claims(token.get('access_token'))
+    id_claims = decode_jwt_claims(token.get('id_token'))
+    claims = merged_claims(access_claims, id_claims, userinfo)
+    roles = extract_roles(access_claims, id_claims, userinfo)
     keycloak_id = claims.get('sub')
     email = claims.get('email')
     if not keycloak_id or not email:
