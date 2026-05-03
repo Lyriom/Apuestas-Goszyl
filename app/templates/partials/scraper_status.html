@@ -1,0 +1,1 @@
+{% set log = latest_logs.get(name.title()) or latest_logs.get(name) %}<span class="text-sm font-semibold text-emerald-600">Ejecutado: {{ saved }} cuotas guardadas{% if log %} · {{ log.status }}{% endif %}</span>
