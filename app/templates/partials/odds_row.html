@@ -1,0 +1,31 @@
+{% for row in rows %}
+<tr class="hidden border-b border-gray-100 odd:bg-gray-50/70 dark:border-slate-700 dark:odd:bg-slate-800/40 md:table-row">
+  <td class="px-4 py-4 font-semibold"><a class="hover:text-emerald-600" href="/partido/{{ row.match.id }}">{{ row.match.home_team }} vs {{ row.match.away_team }}</a><div class="text-xs font-normal text-gray-500 dark:text-slate-400">{{ row.match.tournament }}</div></td>
+  <td class="px-4 py-4 text-sm">{{ row.match.kickoff_at.strftime('%d/%m/%Y %H:%M') }}</td>
+  {% for key, attr in [('home','home_odd'),('draw','draw_odd'),('away','away_odd')] %}
+  <td class="px-4 py-4">
+    {% set best_book = row.best[key][0] %}{% set best_val = row.best[key][1] %}
+    <div class="rounded-xl p-3 {% if best_val %}bg-emerald-500/20 ring-1 ring-emerald-500/40{% else %}bg-gray-100 dark:bg-slate-800{% endif %}">
+      <div class="text-xl font-extrabold text-emerald-700 dark:text-emerald-300">{{ best_val or '-' }}</div>
+      <div class="mt-1 text-xs font-semibold text-gray-600 dark:text-slate-300">{% if best_book %}✓ {{ best_book }}{% else %}Sin cuota{% endif %}</div>
+    </div>
+  </td>
+  {% endfor %}
+  <td class="px-4 py-4 text-sm font-semibold text-emerald-700 dark:text-emerald-300">1: {{ row.best.home[0] or '-' }} · X: {{ row.best.draw[0] or '-' }} · 2: {{ row.best.away[0] or '-' }}</td>
+</tr>
+<tr class="border-b border-gray-200 dark:border-slate-700 md:hidden">
+  <td colspan="6" class="py-3">
+    <a href="/partido/{{ row.match.id }}" class="block rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-800">
+      <div class="font-bold">{{ row.match.home_team }} vs {{ row.match.away_team }}</div>
+      <div class="text-sm text-gray-500 dark:text-slate-400">{{ row.match.kickoff_at.strftime('%d/%m/%Y %H:%M') }} · {{ row.match.tournament }}</div>
+      <div class="mt-4 grid grid-cols-3 gap-2 text-center">
+        <div class="rounded-lg bg-emerald-500/20 p-2"><div class="text-xs">Local</div><div class="font-extrabold">{{ row.best.home[1] or '-' }}</div><div class="text-xs">{{ row.best.home[0] or '-' }}</div></div>
+        <div class="rounded-lg bg-emerald-500/20 p-2"><div class="text-xs">Empate</div><div class="font-extrabold">{{ row.best.draw[1] or '-' }}</div><div class="text-xs">{{ row.best.draw[0] or '-' }}</div></div>
+        <div class="rounded-lg bg-emerald-500/20 p-2"><div class="text-xs">Visitante</div><div class="font-extrabold">{{ row.best.away[1] or '-' }}</div><div class="text-xs">{{ row.best.away[0] or '-' }}</div></div>
+      </div>
+    </a>
+  </td>
+</tr>
+{% else %}
+<tr><td colspan="6" class="px-4 py-10 text-center text-gray-500 dark:text-slate-400">No hay partidos próximos todavía. El scheduler cargará datos cuando ejecute los scrapers.</td></tr>
+{% endfor %}
