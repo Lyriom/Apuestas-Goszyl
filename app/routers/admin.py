@@ -1,13 +1,13 @@
 from fastapi import APIRouter, Depends, Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from loguru import logger
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.dependencies import require_admin
 from app.database import get_db
 from app.templating import templates
-from app.models import Match
+from app.models import Match, Odd
 from app.scrapers.scheduler import SCRAPER_CLASSES, run_scraper
 from app.services.featured_service import count_featured, list_featured
 from app.services.match_service import count_upcoming_matches
@@ -46,6 +46,19 @@ async def matches(request: Request, db: AsyncSession = Depends(get_db)) -> HTMLR
     rows = list((await db.scalars(select(Match).order_by(Match.kickoff_at.asc()))).all())
     odds = await all_raw_odds(db)
     return templates.TemplateResponse(request, 'admin/matches.html', {'matches': rows, 'odds': odds})
+
+
+@router.post('/matches/purge', response_class=HTMLResponse)
+async def purge_matches(request: Request, db: AsyncSession = Depends(get_db)) -> RedirectResponse:
+    odds_deleted = await db.execute(delete(Odd))
+    matches_deleted = await db.execute(delete(Match))
+    await db.commit()
+    logger.warning(
+        'admin_purge_matches odds={} matches={}',
+        odds_deleted.rowcount,
+        matches_deleted.rowcount,
+    )
+    return RedirectResponse('/admin/matches', status_code=303)
 
 
 @router.get('/featured', response_class=HTMLResponse)
