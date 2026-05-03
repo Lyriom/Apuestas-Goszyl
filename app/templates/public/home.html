@@ -22,15 +22,16 @@
       Actualizar
     </button>
   </div>
+  {% if bookmakers %}
   <dl class="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
-    {% set books = ['Ecuabet','Betcris','Bet593','Betano'] %}
-    {% for book in books %}
+    {% for book in bookmakers %}
     <div class="rounded-2xl border border-slate-200/70 bg-white/70 p-4 shadow-soft dark:border-slate-700/60 dark:bg-ink-800/70">
       <dt class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Casa</dt>
       <dd class="mt-1 text-base font-extrabold">{{ book }}</dd>
     </div>
     {% endfor %}
   </dl>
+  {% endif %}
 </section>
 
 <section class="mt-8 overflow-hidden rounded-2xl border border-slate-200/70 bg-white/80 shadow-soft dark:border-slate-700/60 dark:bg-ink-800/70">

@@ -8,8 +8,10 @@ from app.scrapers.bet593 import Bet593Scraper
 from app.scrapers.betano import BetanoScraper
 from app.scrapers.betcris import BetcrisScraper
 from app.scrapers.ecuabet import EcuabetScraper
+from app.scrapers.sofascore import SofascoreScraper
 
 SCRAPER_CLASSES = {
+    'sofascore': SofascoreScraper,
     'ecuabet': EcuabetScraper,
     'betcris': BetcrisScraper,
     'bet593': Bet593Scraper,
@@ -33,7 +35,7 @@ def create_scheduler() -> AsyncIOScheduler:
             'interval',
             args=[name],
             hours=settings.scrapers_interval_hours,
-            next_run_time=now + timedelta(seconds=settings.scrapers_initial_run_delay_seconds, minutes=90 * index),
+            next_run_time=now + timedelta(seconds=settings.scrapers_initial_run_delay_seconds, minutes=45 * index),
             id=f'scraper-{name}',
             max_instances=1,
             coalesce=True,

@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.templating import templates
 from app.services.match_service import get_upcoming_matches
-from app.services.odd_service import comparison_rows, latest_odds_for_match
+from app.services.odd_service import comparison_rows, known_bookmakers, latest_odds_for_match
 
 router = APIRouter()
 
@@ -25,7 +25,8 @@ async def sitemap() -> Response:
 async def home(request: Request, db: AsyncSession = Depends(get_db)) -> HTMLResponse:
     matches = await get_upcoming_matches(db)
     rows = await comparison_rows(db, matches)
-    return templates.TemplateResponse(request, 'public/home.html', {'rows': rows})
+    bookmakers = await known_bookmakers(db)
+    return templates.TemplateResponse(request, 'public/home.html', {'rows': rows, 'bookmakers': bookmakers})
 
 
 @router.get('/partials/odds-table', response_class=HTMLResponse)

@@ -1,12 +1,10 @@
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
-from sqlalchemy import desc, func, select
+from sqlalchemy import desc, distinct, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import Match, Odd
-
-BOOKMAKERS = ['Ecuabet', 'Betcris', 'Bet593', 'Betano']
 
 
 def _decimal(value: float | Decimal | None) -> Decimal | None:
@@ -37,9 +35,15 @@ async def create_odd(
     return odd
 
 
+async def known_bookmakers(db: AsyncSession) -> list[str]:
+    rows = await db.scalars(select(distinct(Odd.bookmaker)).order_by(Odd.bookmaker))
+    return [name for name in rows.all() if name]
+
+
 async def latest_odds_for_match(db: AsyncSession, match_id: int) -> list[Odd]:
+    bookmakers = await known_bookmakers(db)
     rows: list[Odd] = []
-    for bookmaker in BOOKMAKERS:
+    for bookmaker in bookmakers:
         stmt = (
             select(Odd)
             .where(Odd.match_id == match_id, Odd.bookmaker == bookmaker)

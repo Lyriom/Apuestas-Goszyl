@@ -6,7 +6,18 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import Match
 
-TARGET_KEYWORDS = {'ligapro', 'ecuador', 'la tri', 'seleccion ecuador', 'selección ecuador'}
+TARGET_KEYWORDS = {
+    'ligapro',
+    'liga pro',
+    'ecuador',
+    'la tri',
+    'seleccion ecuador',
+    'selección ecuador',
+    'serie a',
+    'primera a',
+    'primera categoria',
+    'copa ecuador',
+}
 
 
 def normalize_team(value: str) -> str:
