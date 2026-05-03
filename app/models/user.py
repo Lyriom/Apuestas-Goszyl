@@ -18,9 +18,10 @@ class User(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
-    def has_role(self, role: str) -> bool:
-        roles = {saved_role.lower() for saved_role in (self.roles or [])}
-        requested = role.lower()
-        if requested == 'admin' and roles.intersection({'admin', 'realm-admin', 'manage-realm', 'manage-users', 'sistema-b-admin'}):
+    def has_role(self, *requested: str) -> bool:
+        saved_roles = {saved_role.lower() for saved_role in (self.roles or [])}
+        requested_roles = {role.lower() for role in requested}
+        admin_aliases = {'admin', 'realm-admin', 'manage-realm', 'manage-users', 'sistema-b-admin'}
+        if 'admin' in requested_roles and saved_roles.intersection(admin_aliases):
             return True
-        return requested in roles
+        return bool(saved_roles.intersection(requested_roles))

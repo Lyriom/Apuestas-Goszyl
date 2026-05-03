@@ -14,7 +14,7 @@ from app.services.match_service import count_upcoming_matches
 from app.services.odd_service import all_raw_odds, count_odds_today
 from app.services.scrape_log_service import all_logs, latest_logs
 
-router = APIRouter(prefix='/admin', tags=['admin'], dependencies=[Depends(require_role('admin'))])
+router = APIRouter(prefix='/admin', tags=['admin'], dependencies=[Depends(require_role('editor', 'admin'))])
 
 
 @router.get('', response_class=HTMLResponse)

@@ -22,9 +22,9 @@ async def require_login(user: User | None = Depends(get_current_user)) -> User:
     return user
 
 
-def require_role(role: str) -> Callable[[User], User]:
+def require_role(*roles: str) -> Callable[[User], User]:
     async def dependency(user: User = Depends(require_login)) -> User:
-        if not user.has_role(role):
+        if not user.has_role(*roles):
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='No tienes permisos para acceder a esta sección')
         return user
 
