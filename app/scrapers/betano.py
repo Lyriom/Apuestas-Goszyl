@@ -4,8 +4,12 @@ from app.scrapers.base import BaseScraper, ScrapedOdd
 class BetanoScraper(BaseScraper):
     bookmaker = 'Betano'
     url = 'https://www.betano.ec'
+    tournament = 'LigaPro Ecuador'
+
+    URLS = [
+        'https://www.betano.ec/sport/futbol/ecuador/serie-a-15094/',
+        'https://www.betano.ec/sport/futbol/ecuador/',
+    ]
 
     async def scrape(self) -> list[ScrapedOdd]:
-        if self.settings.scrapers_use_mock:
-            return await self.mock_data([(2.78, 3.22, 2.50), (2.18, 3.38, 3.22), (1.90, 3.42, 4.35)])
-        return await self.extract_with_playwright(['[data-qa*=event]', '[data-testid*=selection]', '.events-list__grid'])
+        return await self.fetch_events(self.URLS)

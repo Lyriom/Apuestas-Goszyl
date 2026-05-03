@@ -1,6 +1,6 @@
 from functools import lru_cache
 
-from pydantic import AnyHttpUrl, Field
+from pydantic import AnyHttpUrl, Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -30,9 +30,20 @@ class Settings(BaseSettings):
     environment: str = Field(default='development', alias='ENVIRONMENT')
     log_level: str = Field(default='INFO', alias='LOG_LEVEL')
 
-    scrapers_use_mock: bool = Field(default=True, alias='SCRAPERS_USE_MOCK')
+    admin_emails: list[str] = Field(default_factory=list, alias='ADMIN_EMAILS')
+
     scrapers_initial_run_delay_seconds: int = Field(default=30, alias='SCRAPERS_INITIAL_RUN_DELAY_SECONDS')
     scrapers_interval_hours: int = Field(default=6, alias='SCRAPERS_INTERVAL_HOURS')
+    scrapers_timeout_seconds: int = Field(default=60, alias='SCRAPERS_TIMEOUT_SECONDS')
+
+    @field_validator('admin_emails', mode='before')
+    @classmethod
+    def _split_admin_emails(cls, value: object) -> list[str]:
+        if value is None or value == '':
+            return []
+        if isinstance(value, list):
+            return [str(item).strip().lower() for item in value if str(item).strip()]
+        return [item.strip().lower() for item in str(value).split(',') if item.strip()]
 
     @property
     def keycloak_issuer(self) -> str:
@@ -41,6 +52,11 @@ class Settings(BaseSettings):
     @property
     def oidc_discovery_url(self) -> str:
         return f'{self.keycloak_issuer}/.well-known/openid-configuration'
+
+    def is_admin_email(self, email: str | None) -> bool:
+        if not email:
+            return False
+        return email.strip().lower() in self.admin_emails
 
 
 @lru_cache

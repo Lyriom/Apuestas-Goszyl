@@ -1,31 +1,62 @@
 {% for row in rows %}
-<tr class="hidden border-b border-gray-100 odd:bg-gray-50/70 dark:border-slate-700 dark:odd:bg-slate-800/40 md:table-row">
-  <td class="px-4 py-4 font-semibold"><a class="hover:text-emerald-600" href="/partido/{{ row.match.id }}">{{ row.match.home_team }} vs {{ row.match.away_team }}</a><div class="text-xs font-normal text-gray-500 dark:text-slate-400">{{ row.match.tournament }}</div></td>
-  <td class="px-4 py-4 text-sm">{{ row.match.kickoff_at.strftime('%d/%m/%Y %H:%M') }}</td>
-  {% for key, attr in [('home','home_odd'),('draw','draw_odd'),('away','away_odd')] %}
-  <td class="px-4 py-4">
+<tr class="hidden md:table-row hover:bg-slate-50/70 dark:hover:bg-ink-700/40">
+  <td class="px-5 py-4">
+    <a class="group flex flex-col" href="/partido/{{ row.match.id }}">
+      <span class="font-bold text-slate-900 group-hover:text-brand-600 dark:text-slate-100">{{ row.match.home_team }} <span class="text-slate-400">vs</span> {{ row.match.away_team }}</span>
+      <span class="mt-0.5 text-xs font-medium text-slate-500 dark:text-slate-400">{{ row.match.tournament }}</span>
+    </a>
+  </td>
+  <td class="px-5 py-4 text-sm text-slate-700 dark:text-slate-300">
+    <div class="font-semibold">{{ row.match.kickoff_at.strftime('%d/%m/%Y') }}</div>
+    <div class="text-xs text-slate-500 dark:text-slate-400">{{ row.match.kickoff_at.strftime('%H:%M') }} hs</div>
+  </td>
+  {% for key in ['home','draw','away'] %}
     {% set best_book = row.best[key][0] %}{% set best_val = row.best[key][1] %}
-    <div class="rounded-xl p-3 {% if best_val %}bg-emerald-500/20 ring-1 ring-emerald-500/40{% else %}bg-gray-100 dark:bg-slate-800{% endif %}">
-      <div class="text-xl font-extrabold text-emerald-700 dark:text-emerald-300">{{ best_val or '-' }}</div>
-      <div class="mt-1 text-xs font-semibold text-gray-600 dark:text-slate-300">{% if best_book %}✓ {{ best_book }}{% else %}Sin cuota{% endif %}</div>
+    <td class="px-5 py-4 text-center">
+      <div class="mx-auto inline-flex min-w-[88px] flex-col items-center gap-0.5 rounded-xl px-3 py-2 {% if best_val %}bg-brand-50 ring-1 ring-brand-300 dark:bg-brand-900/30 dark:ring-brand-500/40{% else %}bg-slate-100 ring-1 ring-slate-200 dark:bg-ink-700 dark:ring-slate-700{% endif %}">
+        <span class="text-xl font-black {% if best_val %}text-brand-700 dark:text-brand-300{% else %}text-slate-500{% endif %}">{{ best_val or '—' }}</span>
+        <span class="text-[10px] font-bold uppercase tracking-wider {% if best_book %}text-brand-600 dark:text-brand-400{% else %}text-slate-400{% endif %}">{{ best_book or 'sin cuota' }}</span>
+      </div>
+    </td>
+  {% endfor %}
+  <td class="px-5 py-4 text-xs font-semibold text-slate-600 dark:text-slate-300">
+    <div class="space-y-0.5">
+      <div>1 · <span class="text-brand-600 dark:text-brand-300">{{ row.best.home[0] or '—' }}</span></div>
+      <div>X · <span class="text-brand-600 dark:text-brand-300">{{ row.best.draw[0] or '—' }}</span></div>
+      <div>2 · <span class="text-brand-600 dark:text-brand-300">{{ row.best.away[0] or '—' }}</span></div>
     </div>
   </td>
-  {% endfor %}
-  <td class="px-4 py-4 text-sm font-semibold text-emerald-700 dark:text-emerald-300">1: {{ row.best.home[0] or '-' }} · X: {{ row.best.draw[0] or '-' }} · 2: {{ row.best.away[0] or '-' }}</td>
 </tr>
-<tr class="border-b border-gray-200 dark:border-slate-700 md:hidden">
-  <td colspan="6" class="py-3">
-    <a href="/partido/{{ row.match.id }}" class="block rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-800">
-      <div class="font-bold">{{ row.match.home_team }} vs {{ row.match.away_team }}</div>
-      <div class="text-sm text-gray-500 dark:text-slate-400">{{ row.match.kickoff_at.strftime('%d/%m/%Y %H:%M') }} · {{ row.match.tournament }}</div>
-      <div class="mt-4 grid grid-cols-3 gap-2 text-center">
-        <div class="rounded-lg bg-emerald-500/20 p-2"><div class="text-xs">Local</div><div class="font-extrabold">{{ row.best.home[1] or '-' }}</div><div class="text-xs">{{ row.best.home[0] or '-' }}</div></div>
-        <div class="rounded-lg bg-emerald-500/20 p-2"><div class="text-xs">Empate</div><div class="font-extrabold">{{ row.best.draw[1] or '-' }}</div><div class="text-xs">{{ row.best.draw[0] or '-' }}</div></div>
-        <div class="rounded-lg bg-emerald-500/20 p-2"><div class="text-xs">Visitante</div><div class="font-extrabold">{{ row.best.away[1] or '-' }}</div><div class="text-xs">{{ row.best.away[0] or '-' }}</div></div>
+<tr class="md:hidden">
+  <td colspan="6" class="px-3 py-3">
+    <a href="/partido/{{ row.match.id }}" class="block rounded-2xl border border-slate-200/70 bg-white p-4 shadow-soft dark:border-slate-700/60 dark:bg-ink-800">
+      <div class="flex items-baseline justify-between gap-3">
+        <div class="font-bold">{{ row.match.home_team }} <span class="text-slate-400">vs</span> {{ row.match.away_team }}</div>
+        <div class="text-xs text-slate-500 dark:text-slate-400">{{ row.match.kickoff_at.strftime('%d/%m %H:%M') }}</div>
+      </div>
+      <div class="mt-1 text-xs font-medium text-slate-500 dark:text-slate-400">{{ row.match.tournament }}</div>
+      <div class="mt-3 grid grid-cols-3 gap-2 text-center">
+        {% for key, label in [('home','1'),('draw','X'),('away','2')] %}
+        <div class="rounded-xl bg-brand-50 px-2 py-2 ring-1 ring-brand-200 dark:bg-brand-900/30 dark:ring-brand-500/30">
+          <div class="text-[10px] font-bold uppercase tracking-wider text-brand-600 dark:text-brand-300">{{ label }}</div>
+          <div class="mt-1 text-lg font-black text-brand-700 dark:text-brand-200">{{ row.best[key][1] or '—' }}</div>
+          <div class="text-[10px] text-slate-500 dark:text-slate-400">{{ row.best[key][0] or '—' }}</div>
+        </div>
+        {% endfor %}
       </div>
     </a>
   </td>
 </tr>
 {% else %}
-<tr><td colspan="6" class="px-4 py-10 text-center text-gray-500 dark:text-slate-400">No hay partidos próximos todavía. El scheduler cargará datos cuando ejecute los scrapers.</td></tr>
+<tr>
+  <td colspan="6" class="px-6 py-16 text-center">
+    <div class="mx-auto max-w-md">
+      <div class="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-slate-100 text-slate-400 dark:bg-ink-700 dark:text-slate-500">
+        <svg class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 2m6-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      </div>
+      <p class="mt-4 text-base font-semibold text-slate-700 dark:text-slate-300">Aún no hay cuotas capturadas.</p>
+      <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">El scheduler ejecuta los scrapers cada pocas horas. Vuelve en un rato.</p>
+    </div>
+  </td>
+</tr>
 {% endfor %}

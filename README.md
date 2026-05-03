@@ -7,7 +7,7 @@ Comparador público de cuotas pre-partido para LigaPro Ecuador y partidos de la 
 - `app/routers/public.py`: home pública, detalle de partido, healthcheck y sitemap.
 - `app/routers/admin.py`: dashboard protegido con rol `admin`, scrapers, partidos, cuotas crudas y contenido destacado.
 - `app/routers/api_internal.py`: `POST /api/internal/featured-content`, protegido por API key compartida con Sistema A.
-- `app/scrapers/`: scrapers Playwright para Ecuabet, Betcris, Bet593 y Betano. Si `SCRAPERS_USE_MOCK=true`, generan datos demo realistas sin abrir Chromium.
+- `app/scrapers/`: scrapers Playwright reales para Ecuabet, Betcris, Bet593 y Betano. Cada uno navega la sección de fútbol Ecuador y un extractor genérico (`app/scrapers/parser.py`) recupera equipos, hora y 1X2.
 - `app/services/vault_service.py`: descifrado con Vault Transit usando `VAULT_TOKEN` y `VAULT_TRANSIT_KEY`.
 - `alembic/versions/202605030001_initial_schema.py`: crea usuarios, partidos, odds, logs y featured content.
 
@@ -25,7 +25,11 @@ alembic upgrade head
 uvicorn app.main:app --reload
 ```
 
-Con `SCRAPERS_USE_MOCK=true`, el scheduler inserta datos demo si la base está vacía y luego ejecuta los jobs cada 6 horas con stagger de 90 minutos.
+El scheduler ejecuta cada scraper cada `SCRAPERS_INTERVAL_HOURS` horas (default 6h) con stagger de 90 minutos. La primera corrida arranca a los `SCRAPERS_INITIAL_RUN_DELAY_SECONDS` segundos del inicio. No hay modo mock: si la fuente bloquea o cambia, el log marca `error` y no se inserta nada.
+
+## Acceso admin
+
+Solo entran a `/admin` los usuarios cuyo email esté en `ADMIN_EMAILS` (separados por comas) **o** que tengan el rol `admin` (o sus alias) en el JWT de Keycloak. Cualquier otra cuenta autenticada es redirigida a `/auth/no-access` y ve un 403 si intenta acceder directo.
 
 ## Endpoint A -> B
 
@@ -50,7 +54,7 @@ El plaintext descifrado debe ser JSON con `title`, `excerpt`, `content_html` y `
 ## Operación
 
 - Público: `/` y `/partido/{id}`.
-- Admin: `/admin`, requiere login Keycloak y rol `admin`.
+- Admin: `/admin`, requiere login Keycloak + email en `ADMIN_EMAILS` o rol `admin`.
 - Manual scraping: `/admin/scrapers`, botón `Ejecutar ahora`.
 - API interna: `POST /api/internal/featured-content`.
 

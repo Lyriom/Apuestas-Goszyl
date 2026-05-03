@@ -24,11 +24,20 @@ async def require_login(user: User | None = Depends(get_current_user)) -> User:
 
 def require_role(*roles: str) -> Callable[[User], User]:
     async def dependency(user: User = Depends(require_login)) -> User:
+        settings = get_settings()
+        if 'admin' in {role.lower() for role in roles} and settings.is_admin_email(user.email):
+            return user
         if not user.has_role(*roles):
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='No tienes permisos para acceder a esta sección')
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail='Acceso restringido a administradores autorizados.',
+            )
         return user
 
     return dependency
+
+
+require_admin = require_role('admin')
 
 
 def require_api_key(authorization: str | None = Header(default=None)) -> None:

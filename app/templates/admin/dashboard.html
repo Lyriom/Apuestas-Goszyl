@@ -1,12 +1,69 @@
 {% extends 'base.html' %}
-{% block title %}Admin · Apuestas EC{% endblock %}
+{% block title %}Panel admin · {{ app_name }}{% endblock %}
 {% block content %}
-<div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div><h1 class="text-3xl font-extrabold">Panel admin</h1><p class="text-gray-600 dark:text-slate-300">Estado operativo del Sistema B</p></div><a href="/auth/logout" class="rounded-xl border border-gray-200 px-4 py-2 text-sm font-semibold dark:border-slate-700">Salir</a></div>
-<div class="grid gap-4 md:grid-cols-4">
-  <a href="/admin/scrapers" class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800"><div class="text-sm text-gray-500">Scrapers</div><div class="mt-2 text-3xl font-extrabold">{{ latest_logs|length }}</div></a>
-  <a href="/admin/matches" class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800"><div class="text-sm text-gray-500">Partidos próximos</div><div class="mt-2 text-3xl font-extrabold">{{ upcoming_count }}</div></a>
-  <a href="/admin/matches" class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800"><div class="text-sm text-gray-500">Cuotas hoy</div><div class="mt-2 text-3xl font-extrabold">{{ odds_today }}</div></a>
-  <a href="/admin/featured" class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800"><div class="text-sm text-gray-500">Featured Content</div><div class="mt-2 text-3xl font-extrabold">{{ featured_count }}</div></a>
+<div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+  <div>
+    <span class="inline-flex items-center gap-2 rounded-full bg-brand-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-brand-700 dark:bg-brand-900/40 dark:text-brand-300">Sistema B</span>
+    <h1 class="mt-2 text-3xl font-black tracking-tight">Panel administrativo</h1>
+    <p class="mt-1 text-slate-600 dark:text-slate-400">Estado operativo de scrapers, partidos y contenido recibido del Sistema A.</p>
+  </div>
+  <div class="flex items-center gap-2">
+    {% if session_email %}<span class="hidden rounded-lg bg-slate-100 px-3 py-2 text-sm font-semibold text-slate-700 dark:bg-ink-700 dark:text-slate-300 sm:block">{{ session_email }}</span>{% endif %}
+    <a href="/auth/logout" class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-ink-800 dark:text-slate-200 dark:hover:bg-ink-700">Salir</a>
+  </div>
 </div>
-<section class="mt-6 rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800"><h2 class="mb-4 text-lg font-bold">Última ejecución</h2><div class="grid gap-3 md:grid-cols-4">{% for name, log in latest_logs.items() %}<div class="rounded-lg bg-gray-50 p-4 dark:bg-slate-900"><div class="font-bold">{{ name }}</div><div class="text-sm {% if log.status == 'ok' %}text-emerald-600{% elif log.status == 'error' %}text-red-500{% else %}text-gray-500{% endif %}">{{ log.status }}</div><div class="text-xs text-gray-500">{{ log.started_at.strftime('%d/%m %H:%M') }}</div></div>{% else %}<p class="text-gray-500">Sin ejecuciones registradas.</p>{% endfor %}</div></section>
+
+<nav class="mb-6 flex flex-wrap gap-2 text-sm font-semibold">
+  <a href="/admin" class="rounded-lg bg-brand-600 px-4 py-2 text-white shadow-soft">Dashboard</a>
+  <a href="/admin/scrapers" class="rounded-lg border border-slate-200 bg-white px-4 py-2 text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-ink-800 dark:text-slate-200 dark:hover:bg-ink-700">Scrapers</a>
+  <a href="/admin/matches" class="rounded-lg border border-slate-200 bg-white px-4 py-2 text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-ink-800 dark:text-slate-200 dark:hover:bg-ink-700">Partidos & cuotas</a>
+  <a href="/admin/featured" class="rounded-lg border border-slate-200 bg-white px-4 py-2 text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-ink-800 dark:text-slate-200 dark:hover:bg-ink-700">Featured</a>
+</nav>
+
+<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+  {% set cards = [
+    ('/admin/scrapers', 'Scrapers activos', latest_logs|length, 'M13 10V3L4 14h7v7l9-11h-7z'),
+    ('/admin/matches',  'Partidos próximos', upcoming_count, 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z'),
+    ('/admin/matches',  'Cuotas últimas 24h', odds_today, 'M3 3v18h18M9 17V9m4 8V5m4 12v-7'),
+    ('/admin/featured', 'Featured Content', featured_count, 'M5 13l4 4L19 7'),
+  ] %}
+  {% for href, label, value, icon in cards %}
+  <a href="{{ href }}" class="group rounded-2xl border border-slate-200/70 bg-white/80 p-5 shadow-soft transition hover:-translate-y-0.5 hover:shadow-ring dark:border-slate-700/60 dark:bg-ink-800/70">
+    <div class="flex items-center justify-between">
+      <div class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{{ label }}</div>
+      <div class="grid h-8 w-8 place-items-center rounded-lg bg-brand-100 text-brand-600 transition group-hover:bg-brand-600 group-hover:text-white dark:bg-brand-900/40 dark:text-brand-300">
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="{{ icon }}"/></svg>
+      </div>
+    </div>
+    <div class="mt-3 text-4xl font-black">{{ value }}</div>
+  </a>
+  {% endfor %}
+</div>
+
+<section class="mt-8 rounded-2xl border border-slate-200/70 bg-white/80 p-6 shadow-soft dark:border-slate-700/60 dark:bg-ink-800/70">
+  <div class="mb-4 flex items-center justify-between">
+    <h2 class="text-lg font-bold">Última ejecución por casa</h2>
+    <a href="/admin/scrapers" class="text-sm font-semibold text-brand-700 hover:underline dark:text-brand-300">Ver detalle →</a>
+  </div>
+  <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+    {% for name, log in latest_logs.items() %}
+    <div class="rounded-xl border border-slate-200/70 bg-slate-50/70 p-4 dark:border-slate-700/60 dark:bg-ink-700/40">
+      <div class="flex items-center justify-between">
+        <span class="font-bold">{{ name }}</span>
+        {% if log.status == 'ok' %}
+          <span class="inline-flex items-center gap-1 rounded-full bg-brand-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-brand-700 dark:bg-brand-900/40 dark:text-brand-300"><span class="h-1.5 w-1.5 rounded-full bg-brand-500"></span>OK</span>
+        {% elif log.status == 'error' %}
+          <span class="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-red-700 dark:bg-red-900/30 dark:text-red-300"><span class="h-1.5 w-1.5 rounded-full bg-red-500"></span>Error</span>
+        {% else %}
+          <span class="inline-flex items-center gap-1 rounded-full bg-slate-200 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-700 dark:bg-ink-600 dark:text-slate-300">{{ log.status }}</span>
+        {% endif %}
+      </div>
+      <div class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ log.started_at.strftime('%d/%m %H:%M') }} · {{ log.items_count }} items</div>
+      {% if log.error_msg %}<div class="mt-1 truncate text-xs text-red-600 dark:text-red-400" title="{{ log.error_msg }}">{{ log.error_msg }}</div>{% endif %}
+    </div>
+    {% else %}
+    <p class="col-span-full text-sm text-slate-500 dark:text-slate-400">Sin ejecuciones registradas todavía.</p>
+    {% endfor %}
+  </div>
+</section>
 {% endblock %}

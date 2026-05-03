@@ -87,6 +87,7 @@ async def login_redirect(request: Request):
 
 async def handle_callback(request: Request, db: AsyncSession) -> User:
     configure_oauth()
+    settings = get_settings()
     token = await oauth.keycloak.authorize_access_token(request)
     userinfo = dict(token.get('userinfo') or await oauth.keycloak.userinfo(token=token))
     access_claims = decode_jwt_claims(token.get('access_token'))
@@ -97,6 +98,9 @@ async def handle_callback(request: Request, db: AsyncSession) -> User:
     email = claims.get('email')
     if not keycloak_id or not email:
         raise ValueError('Keycloak no devolvió sub/email')
+
+    if settings.is_admin_email(email) and 'admin' not in {r.lower() for r in roles}:
+        roles = sorted({*roles, 'admin'})
 
     user = await db.scalar(select(User).where(User.keycloak_id == keycloak_id))
     if user is None:
@@ -109,6 +113,7 @@ async def handle_callback(request: Request, db: AsyncSession) -> User:
     await db.commit()
     request.session['user_id'] = user.id
     request.session['roles'] = roles
+    request.session['email'] = email
     logger.info('user_logged_in email={} roles={}', email, roles)
     return user
 
