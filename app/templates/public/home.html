@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Apuestas EC · Comparador{% endblock %}
+{% block content %}
+<section class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+  <div>
+    <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">Compara cuotas de la LigaPro EC y la Tri</h1>
+    <p class="mt-3 max-w-2xl text-gray-600 dark:text-slate-300">Las mejores cuotas de Ecuabet, Betcris, Bet593 y Betano en un solo lugar.</p>
+  </div>
+  <button hx-get="/partials/odds-table" hx-target="#odds-body" hx-swap="innerHTML" class="inline-flex items-center justify-center rounded-xl bg-emerald-600 px-4 py-3 text-sm font-bold text-white shadow-sm hover:bg-emerald-700">Actualizar</button>
+</section>
+<section class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800">
+  <div class="overflow-x-auto">
+    <table class="min-w-full text-left">
+      <thead class="sticky top-[65px] z-10 bg-gray-100 text-xs uppercase tracking-wide text-gray-600 dark:bg-slate-700 dark:text-slate-200">
+        <tr><th class="px-4 py-3">Partido</th><th class="px-4 py-3">Fecha</th><th class="px-4 py-3">Local (1)</th><th class="px-4 py-3">Empate (X)</th><th class="px-4 py-3">Visitante (2)</th><th class="px-4 py-3">Mejor casa</th></tr>
+      </thead>
+      <tbody id="odds-body">{% include 'partials/odds_row.html' %}</tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
