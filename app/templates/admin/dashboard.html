@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}Admin · Apuestas EC{% endblock %}
+{% block content %}
+<div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div><h1 class="text-3xl font-extrabold">Panel admin</h1><p class="text-gray-600 dark:text-slate-300">Estado operativo del Sistema B</p></div><a href="/auth/logout" class="rounded-xl border border-gray-200 px-4 py-2 text-sm font-semibold dark:border-slate-700">Salir</a></div>
+<div class="grid gap-4 md:grid-cols-4">
+  <a href="/admin/scrapers" class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800"><div class="text-sm text-gray-500">Scrapers</div><div class="mt-2 text-3xl font-extrabold">{{ latest_logs|length }}</div></a>
+  <a href="/admin/matches" class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800"><div class="text-sm text-gray-500">Partidos próximos</div><div class="mt-2 text-3xl font-extrabold">{{ upcoming_count }}</div></a>
+  <a href="/admin/matches" class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800"><div class="text-sm text-gray-500">Cuotas hoy</div><div class="mt-2 text-3xl font-extrabold">{{ odds_today }}</div></a>
+  <a href="/admin/featured" class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800"><div class="text-sm text-gray-500">Featured Content</div><div class="mt-2 text-3xl font-extrabold">{{ featured_count }}</div></a>
+</div>
+<section class="mt-6 rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800"><h2 class="mb-4 text-lg font-bold">Última ejecución</h2><div class="grid gap-3 md:grid-cols-4">{% for name, log in latest_logs.items() %}<div class="rounded-lg bg-gray-50 p-4 dark:bg-slate-900"><div class="font-bold">{{ name }}</div><div class="text-sm {% if log.status == 'ok' %}text-emerald-600{% elif log.status == 'error' %}text-red-500{% else %}text-gray-500{% endif %}">{{ log.status }}</div><div class="text-xs text-gray-500">{{ log.started_at.strftime('%d/%m %H:%M') }}</div></div>{% else %}<p class="text-gray-500">Sin ejecuciones registradas.</p>{% endfor %}</div></section>
+{% endblock %}
