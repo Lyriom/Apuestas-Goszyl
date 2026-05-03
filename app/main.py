@@ -11,6 +11,7 @@ from app.config import get_settings
 from app.logging_setup import setup_logging
 from app.routers import admin, api_internal, auth, public
 from app.scrapers.scheduler import create_scheduler
+from app.services.schema import ensure_schema
 from app.services.seed import seed_mock_if_empty
 
 settings = get_settings()
@@ -20,6 +21,7 @@ configure_oauth(settings)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    await ensure_schema()
     await seed_mock_if_empty()
     scheduler = create_scheduler()
     scheduler.start()
