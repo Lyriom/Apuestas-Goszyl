@@ -11,7 +11,6 @@ BOOKMAKER_HOMEPAGE = {
     'Doradobet': 'https://doradobet.com/deportes',
     'Bet593': 'https://www.bet593.com/sports/futbol/ecuador',
     'Betano': 'https://www.betano.com/sport/futbol/ecuador-1170/',
-    'Pinnacle': 'https://www.pinnacle.com/en/soccer/ecuador-serie-a/matchups',
 }
 
 

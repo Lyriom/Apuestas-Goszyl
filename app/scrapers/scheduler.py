@@ -7,17 +7,18 @@ from app.config import get_settings
 from app.scrapers.altenar import Bet593Scraper, DoradobetScraper, EcuabetScraper
 from app.scrapers.betano import BetanoScraper
 from app.scrapers.espn import EspnScraper
-from app.scrapers.pinnacle import PinnacleScraper
 
 # Order matters: ESPN runs first to seed match rows with team logos so the
 # bookmaker scrapers later attach odds via find_or_create_match dedup.
+# Pinnacle was removed: their guest API returns 403 from the EasyPanel
+# datacenter IP (verified in prod logs 2026-05-04). If we re-enable it,
+# we'll need a different egress path or a residential proxy.
 SCRAPER_CLASSES = {
     'espn': EspnScraper,
     'ecuabet': EcuabetScraper,
     'doradobet': DoradobetScraper,
     'bet593': Bet593Scraper,
     'betano': BetanoScraper,
-    'pinnacle': PinnacleScraper,
 }
 
 # Casas reales mostradas en el panel admin para monitoreo.
