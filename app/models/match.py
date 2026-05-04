@@ -14,6 +14,8 @@ class Match(Base):
     tournament: Mapped[str] = mapped_column(String(80), index=True)
     home_team: Mapped[str] = mapped_column(String(160), index=True)
     away_team: Mapped[str] = mapped_column(String(160), index=True)
+    home_logo_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    away_logo_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
     kickoff_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
     status: Mapped[str] = mapped_column(String(32), default='scheduled', index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

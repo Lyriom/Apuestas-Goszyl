@@ -22,6 +22,8 @@ class ScrapedOdd:
     draw_odd: float | None
     away_odd: float | None
     tournament: str = 'LigaPro Ecuador'
+    home_logo_url: str | None = None
+    away_logo_url: str | None = None
 
 
 class BaseScraper(ABC):
@@ -67,6 +69,8 @@ class BaseScraper(ABC):
                 home_team=item.home_team,
                 away_team=item.away_team,
                 kickoff_at=item.kickoff_at.astimezone(UTC),
+                home_logo_url=item.home_logo_url,
+                away_logo_url=item.away_logo_url,
             )
             has_prices = any(v is not None for v in (item.home_odd, item.draw_odd, item.away_odd))
             if has_prices:

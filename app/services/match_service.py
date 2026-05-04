@@ -73,6 +73,8 @@ async def find_or_create_match(
     home_team: str,
     away_team: str,
     kickoff_at: datetime,
+    home_logo_url: str | None = None,
+    away_logo_url: str | None = None,
 ) -> Match:
     lower = kickoff_at - timedelta(hours=8)
     upper = kickoff_at + timedelta(hours=8)
@@ -85,9 +87,20 @@ async def find_or_create_match(
     away_norm = normalize_team(away_team)
     for match in candidates:
         if normalize_team(match.home_team) == home_norm and normalize_team(match.away_team) == away_norm:
+            if home_logo_url and not match.home_logo_url:
+                match.home_logo_url = home_logo_url
+            if away_logo_url and not match.away_logo_url:
+                match.away_logo_url = away_logo_url
             return match
 
-    match = Match(tournament=tournament, home_team=home_team, away_team=away_team, kickoff_at=kickoff_at)
+    match = Match(
+        tournament=tournament,
+        home_team=home_team,
+        away_team=away_team,
+        kickoff_at=kickoff_at,
+        home_logo_url=home_logo_url,
+        away_logo_url=away_logo_url,
+    )
     db.add(match)
     await db.flush()
     return match

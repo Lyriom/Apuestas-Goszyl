@@ -7,7 +7,7 @@ Comparador público de cuotas pre-partido para LigaPro Ecuador y partidos de la 
 - `app/routers/public.py`: home pública, detalle de partido, healthcheck y sitemap.
 - `app/routers/admin.py`: dashboard protegido con rol `admin`, scrapers, partidos, cuotas crudas y contenido destacado.
 - `app/routers/api_internal.py`: `POST /api/internal/featured-content`, protegido por API key compartida con Sistema A.
-- `app/scrapers/`: scrapers JSON reales basados en `httpx`. `pinnacle.py` consume la API pública de Pinnacle (LigaPro, Libertadores, Sudamericana, eliminatorias y mundial) y devuelve cuotas 1X2 reales convertidas desde formato americano. `espn.py` complementa con fixtures oficiales de ESPN cuando Pinnacle aún no abrió el mercado.
+- `app/scrapers/`: scrapers JSON reales basados en `httpx` (sin Playwright). `altenar.py` define un adaptador genérico para casas que corren sobre el backend B2B de Altenar (`sb2frontend-altenar2.biahosted.com`) y expone subclases para **Ecuabet**, **Doradobet** y **Bet593** con sus propios márgenes. `pinnacle.py` añade una casa "sharp" desde la API pública de Pinnacle. `espn.py` enriquece con calendario oficial y escudos de equipos cuando alguna casa aún no abrió el mercado. La filtración por categoría 852 (Ecuador) garantiza que solo entran partidos de LigaPro/Serie B y los internacionales con clubes ecuatorianos (Libertadores, Sudamericana, eliminatorias, Mundial).
 - `app/services/vault_service.py`: descifrado con Vault Transit usando `VAULT_TOKEN` y `VAULT_TRANSIT_KEY`.
 - `alembic/versions/202605030001_initial_schema.py`: crea usuarios, partidos, odds, logs y featured content.
 

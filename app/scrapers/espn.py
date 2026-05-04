@@ -111,8 +111,10 @@ class EspnScraper(BaseScraper):
             away = next((c for c in competitors if c.get('homeAway') == 'away'), None)
             if not home or not away:
                 continue
-            home_name = ((home.get('team') or {}).get('displayName') or '').strip()
-            away_name = ((away.get('team') or {}).get('displayName') or '').strip()
+            home_team = home.get('team') or {}
+            away_team = away.get('team') or {}
+            home_name = (home_team.get('displayName') or '').strip()
+            away_name = (away_team.get('displayName') or '').strip()
             if not home_name or not away_name:
                 continue
             results.append(ScrapedOdd(
@@ -124,5 +126,7 @@ class EspnScraper(BaseScraper):
                 home_odd=None,
                 draw_odd=None,
                 away_odd=None,
+                home_logo_url=home_team.get('logo') or None,
+                away_logo_url=away_team.get('logo') or None,
             ))
         return results
