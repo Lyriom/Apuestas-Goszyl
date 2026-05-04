@@ -5,16 +5,23 @@ from loguru import logger
 
 from app.config import get_settings
 from app.scrapers.altenar import Bet593Scraper, DoradobetScraper, EcuabetScraper
+from app.scrapers.betano import BetanoScraper
 from app.scrapers.espn import EspnScraper
 from app.scrapers.pinnacle import PinnacleScraper
 
+# Order matters: ESPN runs first to seed match rows with team logos so the
+# bookmaker scrapers later attach odds via find_or_create_match dedup.
 SCRAPER_CLASSES = {
+    'espn': EspnScraper,
     'ecuabet': EcuabetScraper,
     'doradobet': DoradobetScraper,
     'bet593': Bet593Scraper,
+    'betano': BetanoScraper,
     'pinnacle': PinnacleScraper,
-    'espn': EspnScraper,
 }
+
+# Casas reales mostradas en el panel admin para monitoreo.
+BOOKMAKER_SCRAPERS = ('ecuabet', 'doradobet', 'bet593', 'betano')
 
 
 async def run_scraper(name: str) -> int:
@@ -33,7 +40,7 @@ def create_scheduler() -> AsyncIOScheduler:
             'interval',
             args=[name],
             hours=settings.scrapers_interval_hours,
-            next_run_time=now + timedelta(seconds=settings.scrapers_initial_run_delay_seconds, minutes=10 * index),
+            next_run_time=now + timedelta(seconds=settings.scrapers_initial_run_delay_seconds, minutes=5 * index),
             id=f'scraper-{name}',
             max_instances=1,
             coalesce=True,

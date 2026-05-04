@@ -8,7 +8,7 @@ from app.auth.dependencies import require_admin
 from app.database import get_db
 from app.templating import templates
 from app.models import Match, Odd
-from app.scrapers.scheduler import SCRAPER_CLASSES, run_scraper
+from app.scrapers.scheduler import BOOKMAKER_SCRAPERS, SCRAPER_CLASSES, run_scraper
 from app.services.featured_service import count_featured, list_featured
 from app.services.match_service import count_upcoming_matches
 from app.services.odd_service import all_raw_odds, count_odds_today
@@ -29,7 +29,7 @@ async def dashboard(request: Request, db: AsyncSession = Depends(get_db)) -> HTM
 
 @router.get('/scrapers', response_class=HTMLResponse)
 async def scrapers(request: Request, db: AsyncSession = Depends(get_db)) -> HTMLResponse:
-    return templates.TemplateResponse(request, 'admin/scrapers.html', {'scrapers': SCRAPER_CLASSES.keys(), 'latest_logs': await latest_logs(db), 'logs': await all_logs(db)})
+    return templates.TemplateResponse(request, 'admin/scrapers.html', {'scrapers': BOOKMAKER_SCRAPERS, 'latest_logs': await latest_logs(db), 'logs': await all_logs(db)})
 
 
 @router.post('/scrapers/{name}/run', response_class=HTMLResponse)

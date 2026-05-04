@@ -6,48 +6,80 @@
   Volver
 </a>
 
-<section class="relative mt-4 overflow-hidden rounded-3xl border border-slate-200/70 bg-white/80 p-8 shadow-soft glass dark:border-slate-700/60 dark:bg-ink-800/70">
+<section class="relative mt-4 overflow-hidden rounded-3xl border border-slate-200/70 bg-white/80 p-6 shadow-soft glass dark:border-slate-700/60 dark:bg-ink-800/70 sm:p-10">
   <div class="absolute inset-0 -z-10 bg-gradient-to-br from-brand-500/10 via-transparent to-sky-500/10"></div>
-  <div class="flex flex-col gap-4">
-    <span class="inline-flex w-fit items-center gap-2 rounded-full bg-brand-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-brand-700 dark:bg-brand-900/40 dark:text-brand-300">{{ match.tournament }}</span>
-    <div class="flex flex-col items-center gap-4 sm:flex-row sm:items-center sm:justify-center sm:gap-8">
-      <div class="flex flex-col items-center gap-2 sm:flex-1">
-        {% if match.home_logo_url %}<img src="{{ match.home_logo_url }}" alt="{{ match.home_team }}" class="h-20 w-20 object-contain sm:h-28 sm:w-28">{% endif %}
-        <span class="text-center text-base font-extrabold sm:text-xl">{{ match.home_team }}</span>
+  <div class="flex flex-col gap-6">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <span class="inline-flex items-center gap-2 rounded-full bg-brand-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-brand-700 dark:bg-brand-900/40 dark:text-brand-300">{{ match.tournament }}</span>
+      <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-700 dark:bg-ink-700 dark:text-slate-200">
+        <svg class="mr-1 inline h-3.5 w-3.5 -translate-y-px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+        {{ match.kickoff_at.strftime('%A %d/%m/%Y · %H:%M') }} hs
+      </span>
+    </div>
+
+    <div class="grid grid-cols-3 items-center gap-3 sm:gap-6">
+      <div class="flex flex-col items-center gap-3 text-center">
+        {% if match.home_logo_url %}
+        <img src="{{ match.home_logo_url }}" alt="{{ match.home_team }}" class="h-20 w-20 rounded-2xl bg-white object-contain p-2 ring-1 ring-slate-200 dark:ring-slate-700 sm:h-32 sm:w-32">
+        {% else %}
+        <span class="grid h-20 w-20 place-items-center rounded-2xl bg-slate-100 text-2xl font-black text-slate-500 dark:bg-ink-700 dark:text-slate-300 sm:h-32 sm:w-32 sm:text-3xl">{{ match.home_team[:2]|upper }}</span>
+        {% endif %}
+        <div>
+          <div class="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">Local</div>
+          <div class="text-base font-extrabold sm:text-xl">{{ match.home_team }}</div>
+        </div>
       </div>
-      <span class="text-2xl font-black text-slate-400 sm:text-3xl">vs</span>
-      <div class="flex flex-col items-center gap-2 sm:flex-1">
-        {% if match.away_logo_url %}<img src="{{ match.away_logo_url }}" alt="{{ match.away_team }}" class="h-20 w-20 object-contain sm:h-28 sm:w-28">{% endif %}
-        <span class="text-center text-base font-extrabold sm:text-xl">{{ match.away_team }}</span>
+      <div class="text-center">
+        <div class="text-3xl font-black text-slate-300 dark:text-slate-600 sm:text-5xl">vs</div>
+      </div>
+      <div class="flex flex-col items-center gap-3 text-center">
+        {% if match.away_logo_url %}
+        <img src="{{ match.away_logo_url }}" alt="{{ match.away_team }}" class="h-20 w-20 rounded-2xl bg-white object-contain p-2 ring-1 ring-slate-200 dark:ring-slate-700 sm:h-32 sm:w-32">
+        {% else %}
+        <span class="grid h-20 w-20 place-items-center rounded-2xl bg-slate-100 text-2xl font-black text-slate-500 dark:bg-ink-700 dark:text-slate-300 sm:h-32 sm:w-32 sm:text-3xl">{{ match.away_team[:2]|upper }}</span>
+        {% endif %}
+        <div>
+          <div class="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">Visitante</div>
+          <div class="text-base font-extrabold sm:text-xl">{{ match.away_team }}</div>
+        </div>
       </div>
     </div>
-    <p class="text-center text-slate-600 dark:text-slate-300">
-      <svg class="mr-1 inline h-4 w-4 -translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-      {{ match.kickoff_at.strftime('%A %d/%m/%Y · %H:%M') }} hs
-    </p>
   </div>
 </section>
 
-<div class="mt-6 grid gap-6 lg:grid-cols-[1fr_400px]">
+<div class="mt-6 grid gap-6 lg:grid-cols-[1fr_360px]">
   <section class="rounded-2xl border border-slate-200/70 bg-white/80 p-6 shadow-soft dark:border-slate-700/60 dark:bg-ink-800/70">
-    <h2 class="mb-4 text-lg font-bold">Cuotas actuales por casa</h2>
+    <h2 class="mb-1 text-lg font-bold">Cuotas por casa</h2>
+    <p class="mb-4 text-xs text-slate-500 dark:text-slate-400">Click en una cuota para ir directo a la página de la casa de apuesta.</p>
     <div class="overflow-x-auto">
       <table class="min-w-full text-left text-sm">
         <thead class="bg-slate-50/70 text-xs uppercase tracking-wide text-slate-600 dark:bg-ink-700/60 dark:text-slate-300">
           <tr>
-            <th class="rounded-l-lg px-4 py-3">Casa</th>
-            <th class="px-4 py-3 text-center">1</th>
-            <th class="px-4 py-3 text-center">X</th>
-            <th class="rounded-r-lg px-4 py-3 text-center">2</th>
+            <th class="rounded-l-lg px-4 py-3">Casa de apuesta</th>
+            <th class="px-4 py-3 text-center" title="Gana el local">
+              <span class="block text-[10px] font-bold tracking-wider">Local</span>
+              <span class="block font-mono text-base text-slate-400">1</span>
+            </th>
+            <th class="px-4 py-3 text-center" title="Empate">
+              <span class="block text-[10px] font-bold tracking-wider">Empate</span>
+              <span class="block font-mono text-base text-slate-400">X</span>
+            </th>
+            <th class="rounded-r-lg px-4 py-3 text-center" title="Gana el visitante">
+              <span class="block text-[10px] font-bold tracking-wider">Visita</span>
+              <span class="block font-mono text-base text-slate-400">2</span>
+            </th>
           </tr>
         </thead>
         <tbody class="divide-y divide-slate-100 dark:divide-slate-700/50">
           {% for odd in latest %}
-          <tr>
-            <td class="px-4 py-3 font-bold">{{ odd.bookmaker }}</td>
-            <td class="px-4 py-3 text-center font-mono text-base">{{ odd.home_odd or '—' }}</td>
-            <td class="px-4 py-3 text-center font-mono text-base">{{ odd.draw_odd or '—' }}</td>
-            <td class="px-4 py-3 text-center font-mono text-base">{{ odd.away_odd or '—' }}</td>
+          {% set link = bookmaker_links.get(odd.bookmaker) %}
+          <tr class="hover:bg-slate-50/70 dark:hover:bg-ink-700/40">
+            <td class="px-4 py-3 font-bold">
+              {% if link %}<a href="{{ link }}" target="_blank" rel="noopener nofollow sponsored" class="inline-flex items-center gap-1 text-brand-700 hover:underline dark:text-brand-300">{{ odd.bookmaker }} <span class="text-xs">↗</span></a>{% else %}{{ odd.bookmaker }}{% endif %}
+            </td>
+            <td class="px-4 py-3 text-center font-mono text-base font-extrabold">{{ odd.home_odd or '—' }}</td>
+            <td class="px-4 py-3 text-center font-mono text-base font-extrabold">{{ odd.draw_odd or '—' }}</td>
+            <td class="px-4 py-3 text-center font-mono text-base font-extrabold">{{ odd.away_odd or '—' }}</td>
           </tr>
           {% else %}
           <tr><td colspan="4" class="px-4 py-12 text-center text-slate-500">Sin cuotas capturadas todavía.</td></tr>
@@ -55,6 +87,7 @@
         </tbody>
       </table>
     </div>
+    <p class="mt-4 text-[10px] uppercase tracking-wide text-slate-400">+18 · Apostar puede ser adictivo. Juega con responsabilidad.</p>
   </section>
   <section class="rounded-2xl border border-slate-200/70 bg-white/80 p-6 shadow-soft dark:border-slate-700/60 dark:bg-ink-800/70">
     <h2 class="mb-4 text-lg font-bold">Historial de movimientos</h2>

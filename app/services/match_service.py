@@ -27,22 +27,41 @@ TARGET_KEYWORDS = {
 }
 
 
-_TEAM_SUFFIX_TOKENS = {'fc', 'sc', 'cf', 'club', 'c', 'f'}
+_TEAM_SUFFIX_TOKENS = {'fc', 'sc', 'cf', 'club', 'c', 'f', 'sd', 'cd'}
+_TEAM_PARENTHETICAL = {'(quito)', '(ecuador)', '(loja)', '(guayaquil)'}
+
 _TEAM_ALIASES = {
     'leones': 'leones del norte',
+    'club leones del norte': 'leones del norte',
     'idv': 'independiente del valle',
     'ldu quito': 'ldu',
     'liga de quito': 'ldu',
+    'u catolica': 'universidad catolica del ecuador',
+    'u cat': 'universidad catolica del ecuador',
+    'universidad catolica': 'universidad catolica del ecuador',
+    'universidad catolica quito': 'universidad catolica del ecuador',
+    'libertad loja': 'libertad',
+    'libertad ecuador': 'libertad',
+    'liga de portoviejo': 'portoviejo',
+    'cd santo domingo': 'santo domingo',
+    'tecnico u': 'tecnico universitario',
+    'guayaquil city': 'guayaquil city',
+    'manta': 'manta',
 }
 
 
 def normalize_team(value: str) -> str:
-    base = slugify(value or '', separator=' ').strip()
+    raw = value or ''
+    for paren in _TEAM_PARENTHETICAL:
+        raw = raw.replace(paren, '').replace(paren.upper(), '').replace(paren.title(), '')
+    base = slugify(raw, separator=' ').strip()
     if not base:
         return base
     tokens = base.split()
     while len(tokens) > 1 and tokens[-1] in _TEAM_SUFFIX_TOKENS:
         tokens.pop()
+    while len(tokens) > 1 and tokens[0] in _TEAM_SUFFIX_TOKENS:
+        tokens.pop(0)
     cleaned = ' '.join(tokens)
     return _TEAM_ALIASES.get(cleaned, cleaned)
 

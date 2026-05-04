@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.templating import templates
 from app.services.match_service import get_upcoming_matches
-from app.services.odd_service import comparison_rows, known_bookmakers, latest_odds_for_match
+from app.services.odd_service import bookmaker_url, comparison_rows, known_bookmakers, latest_odds_for_match
 
 router = APIRouter()
 
@@ -46,4 +46,10 @@ async def match_detail(match_id: int, request: Request, db: AsyncSession = Depen
         raise HTTPException(status_code=404, detail='Partido no encontrado')
     latest = await latest_odds_for_match(db, match_id)
     history = list((await db.scalars(select(Odd).where(Odd.match_id == match_id).order_by(desc(Odd.captured_at)).limit(120))).all())
-    return templates.TemplateResponse(request, 'public/match_detail.html', {'match': match, 'latest': latest, 'history': history})
+    bookmaker_links = {odd.bookmaker: bookmaker_url(odd.bookmaker) for odd in latest}
+    return templates.TemplateResponse(request, 'public/match_detail.html', {
+        'match': match,
+        'latest': latest,
+        'history': history,
+        'bookmaker_links': bookmaker_links,
+    })

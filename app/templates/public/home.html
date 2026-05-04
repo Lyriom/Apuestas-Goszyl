@@ -1,60 +1,47 @@
 {% extends 'base.html' %}
 {% block title %}{{ app_name }} · Cuotas LigaPro y la Tri{% endblock %}
 {% block content %}
-<section class="relative overflow-hidden rounded-3xl border border-slate-200/70 bg-white/70 p-8 shadow-soft glass dark:border-slate-700/60 dark:bg-ink-800/70 sm:p-10">
+<section class="relative overflow-hidden rounded-3xl border border-slate-200/70 bg-white/70 p-6 shadow-soft glass dark:border-slate-700/60 dark:bg-ink-800/70 sm:p-10">
   <div class="absolute inset-0 -z-10 bg-gradient-to-br from-brand-500/10 via-transparent to-sky-500/10"></div>
-  <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-    <div class="max-w-2xl">
-      <span class="inline-flex items-center gap-2 rounded-full bg-brand-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-brand-700 dark:bg-brand-900/40 dark:text-brand-300">
-        <span class="relative flex h-2 w-2"><span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-500 opacity-75"></span><span class="relative inline-flex h-2 w-2 rounded-full bg-brand-500"></span></span>
-        Datos en tiempo real
+  <div class="flex flex-col gap-4">
+    <span class="inline-flex w-fit items-center gap-2 rounded-full bg-brand-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-brand-700 dark:bg-brand-900/40 dark:text-brand-300">
+      <span class="relative flex h-2 w-2"><span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-500 opacity-75"></span><span class="relative inline-flex h-2 w-2 rounded-full bg-brand-500"></span></span>
+      Datos en tiempo real · actualiza cada 2 horas
+    </span>
+    <h1 class="text-3xl font-black tracking-tight sm:text-5xl">
+      Cuotas <span class="bg-gradient-to-r from-brand-600 to-emerald-500 bg-clip-text text-transparent">LigaPro</span> y la Tri.
+    </h1>
+    <p class="max-w-2xl text-slate-600 dark:text-slate-300 sm:text-lg">
+      Comparamos automáticamente <strong>Ecuabet</strong>, <strong>Doradobet</strong>, <strong>Bet593</strong> y <strong>Pinnacle</strong>. Click en una cuota para ir directo a la casa de apuesta.
+    </p>
+    {% if bookmakers %}
+    <div class="flex flex-wrap gap-2 pt-2">
+      {% for book in bookmakers %}
+      <span class="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-bold text-slate-700 dark:border-slate-700 dark:bg-ink-700 dark:text-slate-200">
+        <span class="h-1.5 w-1.5 rounded-full bg-brand-500"></span>
+        {{ book }}
       </span>
-      <h1 class="mt-4 text-4xl font-black tracking-tight sm:text-5xl">
-        Las mejores cuotas de la <span class="bg-gradient-to-r from-brand-600 to-emerald-500 bg-clip-text text-transparent">LigaPro</span> y la Tri.
-      </h1>
-      <p class="mt-4 text-base text-slate-600 dark:text-slate-300 sm:text-lg">
-        Cuotas reales 1X2 capturadas de Ecuabet, Doradobet, Bet593 y Pinnacle para LigaPro y la Tri. Resaltamos la mejor cuota del mercado.
-      </p>
+      {% endfor %}
     </div>
-    <button hx-get="/partials/odds-table" hx-target="#odds-body" hx-swap="innerHTML" hx-indicator="#refresh-spinner" class="group inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 px-5 py-3 text-sm font-bold text-white shadow-soft transition hover:shadow-ring active:scale-[0.98]">
+    {% endif %}
+  </div>
+</section>
+
+<section class="mt-6" x-data="{ q: '' }">
+  <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div class="relative flex-1 max-w-md">
+      <svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"/></svg>
+      <input x-model="q" type="search" placeholder="Buscar equipo (Barcelona, IDV, Emelec, Ecuador...)" class="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-9 pr-4 text-sm placeholder-slate-400 shadow-soft focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200 dark:border-slate-700 dark:bg-ink-800 dark:text-slate-100 dark:placeholder-slate-500 dark:focus:ring-brand-900/40">
+    </div>
+    <button hx-get="/partials/odds-table" hx-target="#odds-grid" hx-swap="innerHTML" hx-indicator="#refresh-spinner" class="group inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 px-5 py-2.5 text-sm font-bold text-white shadow-soft transition hover:shadow-ring active:scale-[0.98]">
       <svg id="refresh-spinner" class="h-4 w-4 htmx-indicator animate-spin" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-opacity="0.25" stroke-width="4"/><path d="M4 12a8 8 0 018-8" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg>
       <svg class="h-4 w-4 transition group-hover:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v6h6M20 20v-6h-6M5 20A9 9 0 0119 5"/></svg>
       Actualizar
     </button>
   </div>
-  {% if bookmakers %}
-  <dl class="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
-    {% for book in bookmakers %}
-    <div class="rounded-2xl border border-slate-200/70 bg-white/70 p-4 shadow-soft dark:border-slate-700/60 dark:bg-ink-800/70">
-      <dt class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Casa</dt>
-      <dd class="mt-1 text-base font-extrabold">{{ book }}</dd>
-    </div>
-    {% endfor %}
-  </dl>
-  {% endif %}
-</section>
 
-<section class="mt-8 overflow-hidden rounded-2xl border border-slate-200/70 bg-white/80 shadow-soft dark:border-slate-700/60 dark:bg-ink-800/70">
-  <div class="flex items-center justify-between gap-3 border-b border-slate-200/70 px-5 py-4 dark:border-slate-700/60">
-    <h2 class="text-lg font-bold">Próximos partidos</h2>
-    <span class="text-xs text-slate-500 dark:text-slate-400">La cuota verde es la mejor del mercado</span>
-  </div>
-  <div class="overflow-x-auto scrollbar-thin">
-    <table class="min-w-full text-left">
-      <thead class="bg-slate-50/80 text-xs uppercase tracking-wide text-slate-600 dark:bg-ink-700/60 dark:text-slate-300">
-        <tr>
-          <th class="px-5 py-3">Partido</th>
-          <th class="px-5 py-3">Fecha</th>
-          <th class="px-5 py-3 text-center">Local · 1</th>
-          <th class="px-5 py-3 text-center">Empate · X</th>
-          <th class="px-5 py-3 text-center">Visitante · 2</th>
-          <th class="px-5 py-3">Mejores casas</th>
-        </tr>
-      </thead>
-      <tbody id="odds-body" class="divide-y divide-slate-100 dark:divide-slate-700/50">
-        {% include 'partials/odds_row.html' %}
-      </tbody>
-    </table>
+  <div id="odds-grid" class="mt-5 grid gap-4 md:grid-cols-2">
+    {% include 'partials/odds_row.html' %}
   </div>
 </section>
 {% endblock %}

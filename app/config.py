@@ -33,7 +33,7 @@ class Settings(BaseSettings):
     admin_emails: list[str] = Field(default_factory=list, alias='ADMIN_EMAILS')
 
     scrapers_initial_run_delay_seconds: int = Field(default=30, alias='SCRAPERS_INITIAL_RUN_DELAY_SECONDS')
-    scrapers_interval_hours: int = Field(default=6, alias='SCRAPERS_INTERVAL_HOURS')
+    scrapers_interval_hours: int = Field(default=2, alias='SCRAPERS_INTERVAL_HOURS')
     scrapers_timeout_seconds: int = Field(default=60, alias='SCRAPERS_TIMEOUT_SECONDS')
 
     @field_validator('admin_emails', mode='before')

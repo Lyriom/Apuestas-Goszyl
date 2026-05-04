@@ -6,6 +6,20 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import Match, Odd
 
+BOOKMAKER_HOMEPAGE = {
+    'Ecuabet': 'https://ecuabet.com/deportes',
+    'Doradobet': 'https://doradobet.com/deportes',
+    'Bet593': 'https://www.bet593.com/sports/futbol/ecuador',
+    'Betano': 'https://www.betano.com/sport/futbol/ecuador-1170/',
+    'Pinnacle': 'https://www.pinnacle.com/en/soccer/ecuador-serie-a/matchups',
+}
+
+
+def bookmaker_url(name: str | None) -> str | None:
+    if not name:
+        return None
+    return BOOKMAKER_HOMEPAGE.get(name)
+
 
 def _decimal(value: float | Decimal | None) -> Decimal | None:
     if value is None:
@@ -56,12 +70,18 @@ async def latest_odds_for_match(db: AsyncSession, match_id: int) -> list[Odd]:
     return rows
 
 
-async def best_odd_per_outcome(db: AsyncSession, match_id: int) -> dict[str, tuple[str | None, Decimal | None]]:
+async def best_odd_per_outcome(
+    db: AsyncSession, match_id: int,
+) -> dict[str, tuple[str | None, Decimal | None, str | None]]:
     odds = await latest_odds_for_match(db, match_id)
-    result: dict[str, tuple[str | None, Decimal | None]] = {}
+    result: dict[str, tuple[str | None, Decimal | None, str | None]] = {}
     for attr, key in [('home_odd', 'home'), ('draw_odd', 'draw'), ('away_odd', 'away')]:
         valid = [(odd.bookmaker, getattr(odd, attr)) for odd in odds if getattr(odd, attr) is not None]
-        result[key] = max(valid, key=lambda item: item[1]) if valid else (None, None)
+        if valid:
+            book, value = max(valid, key=lambda item: item[1])
+            result[key] = (book, value, bookmaker_url(book))
+        else:
+            result[key] = (None, None, None)
     return result
 
 
