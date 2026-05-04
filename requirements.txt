@@ -14,7 +14,6 @@ loguru==0.7.3
 bleach==6.2.0
 python-slugify==8.0.4
 email-validator==2.2.0
-playwright==1.49.1
 APScheduler==3.11.0
 python-keycloak==5.1.1
 Authlib==1.4.0

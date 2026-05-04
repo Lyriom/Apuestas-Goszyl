@@ -17,11 +17,34 @@ TARGET_KEYWORDS = {
     'primera a',
     'primera categoria',
     'copa ecuador',
+    'copa libertadores',
+    'copa sudamericana',
+    'fifa world cup',
+    'world cup',
+    'copa america',
+    'eliminatorias',
+    'eliminatorias sudamericanas',
+}
+
+
+_TEAM_SUFFIX_TOKENS = {'fc', 'sc', 'cf', 'club', 'c', 'f'}
+_TEAM_ALIASES = {
+    'leones': 'leones del norte',
+    'idv': 'independiente del valle',
+    'ldu quito': 'ldu',
+    'liga de quito': 'ldu',
 }
 
 
 def normalize_team(value: str) -> str:
-    return slugify(value or '', separator=' ')
+    base = slugify(value or '', separator=' ').strip()
+    if not base:
+        return base
+    tokens = base.split()
+    while len(tokens) > 1 and tokens[-1] in _TEAM_SUFFIX_TOKENS:
+        tokens.pop()
+    cleaned = ' '.join(tokens)
+    return _TEAM_ALIASES.get(cleaned, cleaned)
 
 
 def is_target_tournament(tournament: str) -> bool:

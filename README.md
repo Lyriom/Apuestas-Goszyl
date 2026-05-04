@@ -7,7 +7,7 @@ Comparador público de cuotas pre-partido para LigaPro Ecuador y partidos de la 
 - `app/routers/public.py`: home pública, detalle de partido, healthcheck y sitemap.
 - `app/routers/admin.py`: dashboard protegido con rol `admin`, scrapers, partidos, cuotas crudas y contenido destacado.
 - `app/routers/api_internal.py`: `POST /api/internal/featured-content`, protegido por API key compartida con Sistema A.
-- `app/scrapers/`: scrapers Playwright reales para Ecuabet, Betcris, Bet593 y Betano. Cada uno navega la sección de fútbol Ecuador y un extractor genérico (`app/scrapers/parser.py`) recupera equipos, hora y 1X2.
+- `app/scrapers/`: scrapers JSON reales basados en `httpx`. `pinnacle.py` consume la API pública de Pinnacle (LigaPro, Libertadores, Sudamericana, eliminatorias y mundial) y devuelve cuotas 1X2 reales convertidas desde formato americano. `espn.py` complementa con fixtures oficiales de ESPN cuando Pinnacle aún no abrió el mercado.
 - `app/services/vault_service.py`: descifrado con Vault Transit usando `VAULT_TOKEN` y `VAULT_TRANSIT_KEY`.
 - `alembic/versions/202605030001_initial_schema.py`: crea usuarios, partidos, odds, logs y featured content.
 
@@ -18,14 +18,13 @@ cd /Users/lyriom/Documents/Goszyl/sistema-b
 python3.11 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-playwright install chromium
 cp .env.example .env
 # ajusta DATABASE_URL, Keycloak, Vault y secretos
 alembic upgrade head
 uvicorn app.main:app --reload
 ```
 
-El scheduler ejecuta cada scraper cada `SCRAPERS_INTERVAL_HOURS` horas (default 6h) con stagger de 90 minutos. La primera corrida arranca a los `SCRAPERS_INITIAL_RUN_DELAY_SECONDS` segundos del inicio. No hay modo mock: si la fuente bloquea o cambia, el log marca `error` y no se inserta nada.
+El scheduler ejecuta cada scraper cada `SCRAPERS_INTERVAL_HOURS` horas (default 6h) con stagger de 20 minutos. La primera corrida arranca a los `SCRAPERS_INITIAL_RUN_DELAY_SECONDS` segundos del inicio. No hay modo mock: si la fuente bloquea o cambia, el log marca `error` y no se inserta nada.
 
 ## Acceso admin
 

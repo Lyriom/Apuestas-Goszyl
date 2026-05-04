@@ -4,18 +4,12 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from loguru import logger
 
 from app.config import get_settings
-from app.scrapers.bet593 import Bet593Scraper
-from app.scrapers.betano import BetanoScraper
-from app.scrapers.betcris import BetcrisScraper
-from app.scrapers.ecuabet import EcuabetScraper
-from app.scrapers.sofascore import SofascoreScraper
+from app.scrapers.espn import EspnScraper
+from app.scrapers.pinnacle import PinnacleScraper
 
 SCRAPER_CLASSES = {
-    'sofascore': SofascoreScraper,
-    'ecuabet': EcuabetScraper,
-    'betcris': BetcrisScraper,
-    'bet593': Bet593Scraper,
-    'betano': BetanoScraper,
+    'pinnacle': PinnacleScraper,
+    'espn': EspnScraper,
 }
 
 
@@ -35,7 +29,7 @@ def create_scheduler() -> AsyncIOScheduler:
             'interval',
             args=[name],
             hours=settings.scrapers_interval_hours,
-            next_run_time=now + timedelta(seconds=settings.scrapers_initial_run_delay_seconds, minutes=45 * index),
+            next_run_time=now + timedelta(seconds=settings.scrapers_initial_run_delay_seconds, minutes=20 * index),
             id=f'scraper-{name}',
             max_instances=1,
             coalesce=True,
