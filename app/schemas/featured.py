@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field
 
 
 class FeaturedContentEncryptedIn(BaseModel):
-    post_id: int = Field(gt=0)
+    post_id: str = Field(min_length=1, max_length=64)
     ciphertext: str = Field(min_length=10)
 
 
@@ -17,7 +17,7 @@ class FeaturedPlaintext(BaseModel):
 
 class FeaturedContentRead(BaseModel):
     id: int
-    post_id: int
+    post_id: str
     title: str
     excerpt: str
     content_html: str

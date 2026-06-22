@@ -36,7 +36,7 @@ Solo entran a `/admin` los usuarios cuyo email esté en `ADMIN_EMAILS` (separado
 curl -X POST https://apuestas.gozsyl.cloud/api/internal/featured-content \
   -H "Authorization: Bearer $SISTEMA_A_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"post_id":1,"ciphertext":"vault:v1:..."}'
+  -d '{"post_id":"<uuid-del-post>","ciphertext":"vault:v1:..."}'
 ```
 
 El plaintext descifrado debe ser JSON con `title`, `excerpt`, `content_html` y `slug`. El HTML se sanitiza antes de guardarse.

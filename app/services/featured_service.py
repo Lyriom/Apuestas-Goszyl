@@ -10,7 +10,7 @@ ALLOWED_TAGS = bleach.sanitizer.ALLOWED_TAGS | {'p', 'br', 'h2', 'h3', 'ul', 'ol
 ALLOWED_ATTRS = {'a': ['href', 'title', 'rel', 'target']}
 
 
-async def decrypt_and_save(db: AsyncSession, *, post_id: int, ciphertext: str, vault: VaultService | None = None) -> FeaturedContent:
+async def decrypt_and_save(db: AsyncSession, *, post_id: str, ciphertext: str, vault: VaultService | None = None) -> FeaturedContent:
     vault_service = vault or VaultService()
     payload = FeaturedPlaintext.model_validate(vault_service.decrypt_json(ciphertext))
     clean_html = bleach.clean(payload.content_html, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRS, strip=True)
