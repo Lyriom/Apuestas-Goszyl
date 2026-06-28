@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.templating import templates
+from app.services.featured_service import get_featured_by_slug, list_featured
 from app.services.match_service import get_upcoming_matches
 from app.services.odd_service import bookmaker_url, comparison_rows, known_bookmakers, latest_odds_for_match
 
@@ -26,7 +27,16 @@ async def home(request: Request, db: AsyncSession = Depends(get_db)) -> HTMLResp
     matches = await get_upcoming_matches(db)
     rows = await comparison_rows(db, matches)
     bookmakers = await known_bookmakers(db)
-    return templates.TemplateResponse(request, 'public/home.html', {'rows': rows, 'bookmakers': bookmakers})
+    featured = await list_featured(db)
+    return templates.TemplateResponse(request, 'public/home.html', {'rows': rows, 'bookmakers': bookmakers, 'featured': featured})
+
+
+@router.get('/destacado/{slug}', response_class=HTMLResponse)
+async def featured_detail(slug: str, request: Request, db: AsyncSession = Depends(get_db)) -> HTMLResponse:
+    item = await get_featured_by_slug(db, slug)
+    if not item:
+        raise HTTPException(status_code=404, detail='Contenido no encontrado')
+    return templates.TemplateResponse(request, 'public/featured_detail.html', {'item': item})
 
 
 @router.get('/partials/odds-table', response_class=HTMLResponse)

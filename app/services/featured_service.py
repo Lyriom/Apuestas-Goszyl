@@ -40,5 +40,9 @@ async def list_featured(db: AsyncSession) -> list[FeaturedContent]:
     return list((await db.scalars(select(FeaturedContent).order_by(FeaturedContent.received_at.desc()))).all())
 
 
+async def get_featured_by_slug(db: AsyncSession, slug: str) -> FeaturedContent | None:
+    return await db.scalar(select(FeaturedContent).where(FeaturedContent.slug == slug))
+
+
 async def count_featured(db: AsyncSession) -> int:
     return len(await list_featured(db))
