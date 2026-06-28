@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     database_url: str = Field(alias='DATABASE_URL')
     secret_key: str = Field(alias='SECRET_KEY')
     session_cookie_name: str = Field(default='sistema_b_session', alias='SESSION_COOKIE_NAME')
+    session_max_age_seconds: int = Field(default=28800, alias='SESSION_MAX_AGE_SECONDS')
 
     keycloak_url: AnyHttpUrl = Field(alias='KEYCLOAK_URL')
     keycloak_realm: str = Field(alias='KEYCLOAK_REALM')

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.auth.keycloak import clear_session, handle_callback, login_redirect
+from app.auth.keycloak import clear_session, handle_callback, keycloak_logout_url, login_redirect
 from app.config import get_settings
 from app.database import get_db
 from app.templating import templates
@@ -31,5 +31,7 @@ async def no_access(request: Request) -> HTMLResponse:
 
 @router.get('/logout')
 async def logout(request: Request) -> RedirectResponse:
+    id_token = request.session.get('id_token')
     clear_session(request)
-    return RedirectResponse('/', status_code=303)
+    logout_url = await keycloak_logout_url(id_token)
+    return RedirectResponse(logout_url or '/', status_code=303)

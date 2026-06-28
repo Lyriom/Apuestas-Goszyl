@@ -1,6 +1,7 @@
 import base64
 import json
 from typing import Any
+from urllib.parse import urlencode
 
 from authlib.integrations.starlette_client import OAuth
 from fastapi import Request
@@ -114,9 +115,26 @@ async def handle_callback(request: Request, db: AsyncSession) -> User:
     request.session['user_id'] = user.id
     request.session['roles'] = roles
     request.session['email'] = email
+    request.session['id_token'] = token.get('id_token')
     logger.info('user_logged_in email={} roles={}', email, roles)
     return user
 
 
 def clear_session(request: Request) -> None:
     request.session.clear()
+
+
+async def keycloak_logout_url(id_token: str | None = None) -> str | None:
+    """RP-initiated logout URL so logging out really ends the Keycloak SSO
+    session (not just our local cookie). Without this, returning to /admin
+    silently re-authenticates via the still-open Keycloak session."""
+    configure_oauth()
+    settings = get_settings()
+    metadata = await oauth.keycloak.load_server_metadata()
+    end_session = metadata.get('end_session_endpoint')
+    if not end_session:
+        return None
+    params = {'post_logout_redirect_uri': f'{str(settings.app_url).rstrip("/")}/'}
+    if id_token:
+        params['id_token_hint'] = id_token
+    return f'{end_session}?{urlencode(params)}'
